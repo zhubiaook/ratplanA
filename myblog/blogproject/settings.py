@@ -23,9 +23,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '10%xnn(^awgkp^s)*j7$4u7secp*c*=rnt6kn-_0u^u9ad0^vf'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
+DEBUG = False
+ALLOWED_HOSTS = ['blog.zybz.fun', '127.0.0.1']
 
 
 # Application definition
@@ -78,10 +77,11 @@ WSGI_APPLICATION = 'blogproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '192.168.0.51',
-        'NAME': 'blog',
+        'HOST': '118.25.173.231',
+        'PORT': '3306',
+        'NAME': 'myblog',
         'USER': 'root',
-        'PASSWORD': '1234',
+        'PASSWORD': '224517@Ok',
     }
 }
 
