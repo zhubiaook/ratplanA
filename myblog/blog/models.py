@@ -2,7 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.html import strip_tags
+from django.utils.text import slugify
+from django.utils.functional import cached_property
 from markdown import Markdown
+from markdown.extensions.toc import TocExtension
+import re
 
 
 class Category(models.Model):
@@ -36,6 +40,7 @@ class Article(models.Model):
     category = models.ForeignKey(Category, verbose_name='分类', on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag, verbose_name='标签', blank=True)
     author = models.ForeignKey(User, verbose_name='作者', on_delete=models.CASCADE)
+    views = models.PositiveIntegerField(default=0)
 
     class Meta:
         verbose_name = '文章'
@@ -51,6 +56,36 @@ class Article(models.Model):
         self.abstract = strip_tags(md.convert(self.body))[:54]
         super().save(*args, **kwargs)
 
+    def increase_views(self):
+        self.views += 1
+        self.save(update_fields=['views'])
+
+    @cached_property
+    def rich_content(self):
+        return generate_rich_content(self.body)
+
+    @property
+    def toc(self):
+        return self.rich_content.get('toc', '')
+
+    @property
+    def body_html(self):
+        return self.rich_content.get('content', '')
+
     def __str__(self):
         return self.title
 
+
+def generate_rich_content(value):
+    md = Markdown(extensions=[
+        'markdown.extensions.extra',
+        'markdown.extensions.codehilite',
+        TocExtension(slugify=slugify)
+    ])
+    content = md.convert(value)
+    result = re.search(r'<ul>(.*)</ul>', md.toc, re.S)
+    if result:
+        toc = result.group(1)
+    else:
+        toc = ""
+    return {'content': content, 'toc': toc}

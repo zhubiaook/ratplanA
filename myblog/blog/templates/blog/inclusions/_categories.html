@@ -3,7 +3,7 @@
     <ul>
         {% for category in  category_list %}
             <li>
-                <a href="{% url 'blog:category' category.id %}">{{ category.name }} <span class="post-count">(8)</span></a>
+                <a href="{% url 'blog:category' category.id %}">{{ category.name }} <span class="post-count">({{ category.num_article }})</span></a>
             </li>
             {% empty %}
                 没有分类

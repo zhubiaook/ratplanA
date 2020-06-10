@@ -1,5 +1,6 @@
 from django import template
 from ..models import Article, Category, Tag
+from django.db.models.aggregates import Count
 
 
 register = template.Library()
@@ -22,12 +23,12 @@ def show_archives(context):
 @register.inclusion_tag('blog/inclusions/_categories.html', takes_context=True)
 def show_categories(context):
     return {
-        'category_list': Category.objects.all()
+        'category_list': Category.objects.annotate(num_article=Count('article')).filter(num_article__gt=0)
     }
 
 
 @register.inclusion_tag('blog/inclusions/_tags.html', takes_context=True)
 def show_tags(context):
     return {
-        'tag_list': Tag.objects.all()
+        'tag_list': Tag.objects.annotate(num_article=Count('article')).filter(num_article__gt=0)
     }
